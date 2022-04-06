@@ -9,7 +9,7 @@ int main() {
 	system("title Proyecto Final");
 
 	int EleccionMenu = 0;//Almacena la respuesta del usuario
-    bool EleccionInvalida = false;//
+    bool RespuestaInvalida = true;//Boleano correspondiente al estado de invalidez de respuesta introducida
 
 	cout <<	"****************************************************************\n*";
 	cout.width(39);
@@ -26,15 +26,18 @@ int main() {
 
     do {
         cin >> EleccionMenu;
-        bool EleccionInvalida = (CinFail() || 6<EleccionMenu<1);
-    } while(EleccionInvalida);
-
-    
+        RespuestaInvalida = (CinFail() || EleccionMenu>6 || EleccionMenu<1);
+        if (RespuestaInvalida) {
+            cout << "\n\n   ***ERROR, DATOS INGRESADOS INVÁLIDOS***\n\n"
+            "Digite un número para acceder a la opción: ";
+        }
+    } while(RespuestaInvalida);
+    cout << "\n\n";
     return 0;
 }
 
 bool CinFail() {
-    if (cin.fail) {
+    if (cin.fail()) {
         cin.clear();
         cin.ignore();
         fflush(stdin);
