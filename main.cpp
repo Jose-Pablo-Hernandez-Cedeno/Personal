@@ -74,7 +74,7 @@ int MenuPrincipal() {
     do {
         getline(cin, InfoIngresada, '\n');
 		if (ValidarCaracterNumerico(InfoIngresada[0])) {
-			int Eleccion = ConvertirChar(InfoIngresada[0]);
+			Eleccion = ConvertirChar(InfoIngresada[0]);
 			RespuestaValida = (InfoIngresada.length() == 1 && 1 <= Eleccion && Eleccion <= 6);
 		} else {
 			RespuestaValida = false;
@@ -90,9 +90,9 @@ int MenuPrincipal() {
 
 bool ValidarCaracterNumerico(char Caracter) {
 	const int CantCaracNumericos = 10;//Cantidad total de posibles caracteres númericos
-	char ValidarCaracterNumerico[CantCaracNumericos] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};//Arreglo de posibles caracteres numéricos
+	char CaracterNumerico[CantCaracNumericos] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};//Arreglo de posibles caracteres numéricos
 	for (int Indice = 0 ; Indice < CantCaracNumericos ; Indice++) {
-		if (Caracter == ValidarCaracterNumerico[Indice]) {
+		if (Caracter == CaracterNumerico[Indice]) {
 			return true;
 		}//Fin if que compara al caracter con el elemento del arreglo de posibles caracteres numéricos
 	}//Fin for que recorre los elementos del Arreglo de posibles caracteres numéricos
@@ -101,10 +101,11 @@ bool ValidarCaracterNumerico(char Caracter) {
 
 int ConvertirChar(char Caracter) {
 	const int CantCaracNumericos = 10;//Cantidad total de posibles caracteres númericos
-	char ValidarCaracterNumerico[CantCaracNumericos] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};//Arreglo de posibles caracteres numéricos
+	char CaracterNumerico[CantCaracNumericos] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};//Arreglo de posibles caracteres numéricos
 	for (int Indice = 0 ; Indice < CantCaracNumericos ; Indice++) {
-		if (Caracter == ValidarCaracterNumerico[Indice]) {
+		if (Caracter == CaracterNumerico[Indice]) {
 			return Indice;//Se retorna el valor numérico del caracter númerico de ser el caso
 		}//Fin if que compara al caracter con el elemento del arreglo de posibles caracteres numéricos
 	}//Fin for que recorre los elementos del Arreglo de posibles caracteres numéricos
 }//Fin función que recibe un caracter numérico y retorna su quivalente en tipo int
+
