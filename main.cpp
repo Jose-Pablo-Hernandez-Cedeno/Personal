@@ -6,17 +6,21 @@ int MenuPrincipal();//Función que imprime el menú y retorna elección del usua
 bool ValidarCaracterNumerico(char Carcater);//Algoritmo de búsqueda lineal que retorna true solo si el caracter se valida como dato numérico
 int ConvertirChar(char Caracter);//Función que recibe un caracter numérico y retorna su quivalente en tipo int
 char LeerValidandoChar(char ValorPosible1, char ValorPosible2);//Función que lee un caracter validando que tome uno de los 2 valores especificados en los argumentos
+string LeerValidandoCedula();
 
 int main() {
 	setlocale(LC_CTYPE,"");
 	system("title Proyecto Final");
 
 	int EleccionMenu = 0;//Almacena la elección del usuario para el menú en caso de cumplirse parametros de entrada
-	bool VolverAlMenu = true;//Boleano que controla si debe reiniciarse el programa y o si no
+	bool VolverAlMenu = false;//Boleano que controla si debe reiniciarse el programa y o si no
 	
 	do {
-		//Menú principal
+		//Reinicio de variable para finalizar ejecución del programa por default al acabar ejecución del ciclo del do-while
 		system("cls");
+		VolverAlMenu = false;
+		
+		//Menú principal
 		EleccionMenu = MenuPrincipal();
 		system("cls");
 
@@ -24,14 +28,25 @@ int main() {
 		switch (EleccionMenu) {
 		case (1):
 			//Mecánica ingresar jugadores
+			cout <<	"****************************************************************\n";
+			cout.width(42);
+			cout <<right<< "Ingresar Jugadores\n";
+			cout << "****************************************************************\n\n";
+			RegistrarCedula();
 			break;
 		
 		case (2):
 			//Jugar hiatos y diptongos
+			cout <<	"****************************************************************\n";
+			cout.width(45.5);
+			cout <<right<< "Jugar Hiatos y Diptongos\n";
+			cout << "****************************************************************\n\n";
+			
 			break;
 		
 		case (3):
 			//Jugar antónimos y sinónimos
+
 			break;
 		
 		case (4):
@@ -91,9 +106,7 @@ int MenuPrincipal() {
 		if (ValidarCaracterNumerico(InfoIngresada[0])) {
 			Eleccion = ConvertirChar(InfoIngresada[0]);
 			RespuestaValida = (InfoIngresada.length() == 1 && 1 <= Eleccion && Eleccion <= 6);
-		} else {
-			RespuestaValida = false;
-		}//Fin if-else de validaciones de parámetros de ingreso
+		}//Fin if de validaciones de parámetros de ingreso que se efectúan en caso de haber un primer caracter numérico 
 		
         if (!RespuestaValida) {
             cout << "\n\n   ***ERROR, DATOS INGRESADOS INVÁLIDOS***\n\n"
@@ -133,8 +146,58 @@ char LeerValidandoChar(char ValorPosible1, char ValorPosible2) {
 		//Fin validaciones de parámetros de ingreso
 		if (!RespuestaValida) {
 			cout << "\n\n   ***ERROR, DATOS INGRESADOS INVÁLIDOS***\n\n"
+			"Formato de respuesta: S/N\n"
 			"Su respuesta: ";
 		}//Fin if para mostar mensaje de error en caso de no cumplir parámetros de ingreso
 	} while(!RespuestaValida);
 	return ValorLeido[0];	
 }//Función que lee un caracter validando que tome uno de los 2 valores especificados en los argumentos
+
+RegistrarCedula() {
+	string Cedula;
+	string NombreJugador;
+	bool CedulaRepetida = false;
+	do {
+		Cedula = LeerValidandoCedula();
+		getline(cin, NombreJugador, '\n');
+		CedulaRepetida = EncontrarCedula(Cedula);
+		if (CedulaRepetida) {
+			cout << "  ***El jugador ya existe, la cédula ya fue registrada anteriormente, intentelo de nuevo***\n\n";
+		} else {
+			cout << "El jugador ha sido registrado correctamente\n\n";
+			ofstream archivo("Registros_jugadores.txt", ios::app);
+			archivo << Cedula+' '+NombreJugador+' '+'0'+' '+'\n';
+		}
+	} while (CedulaRepetida);
+	
+	
+
+}
+
+string LeerValidandoCedula() {
+	string Intento;
+	const int NumDigitos = 10;//Número de dígitos requeridos en el formato de cédula usado
+	int IndCaracter = 0;
+	bool CaracteresNumericos = true;//Almacena estado de validez de datos ingresados en cuanto asi son numéricos en su totalidad o no
+	bool CedulaValida = false;//Almacena estado de validez de datos ingresados
+	
+	do {
+		cout << "Formato de respuesta: (10 Dígitos | Solo números)\n"
+		"Número de cédula: ";
+		getline(cin, Intento, '\n');
+		while (Intento[IndCaracter] != '\n') {
+			if (!ValidarCaracterNumerico(Intento[IndCaracter])) {
+				CaracteresNumericos = false;
+			}
+			IndCaracter++;
+		}
+		CedulaValida = (CaracteresNumericos && Intento.length() == 10);
+		if (!CedulaValida) {
+			cout << "\n\n   ***ERROR, DATOS INGRESADOS INVÁLIDOS***\n\n"
+			"Formato de respuesta: (10 Dígitos | Solo números)\n"
+			"Número de cédula: ";
+		}
+	} while (!CedulaValida);
+	cout << "\n\n";
+	return Intento;
+}
