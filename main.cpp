@@ -178,7 +178,7 @@ void RegistrarDatosUsuario() {
 		NombreJugador = LeerValidandoNombre();
 		CedulaRepetida = BuscarRegistro(Cedula, "Registros_jugadores.txt", 1);
 		if (CedulaRepetida) {
-			cout << "  ***El jugador ya existe, la cédula ya fue registrada anteriormente, intentelo de nuevo***\n\n";
+			cout << "  ***El jugador ya existe en el registro, intentelo de nuevo***\n\n";
 		} else {
 			cout << "El jugador ha sido registrado correctamente!!!\n\n";
 			ofstream archivo("Registros_jugadores.txt", ios::app);
@@ -191,21 +191,20 @@ void RegistrarDatosUsuario() {
 string LeerValidandoCedula() {
 	string Intento;//Almacena los datos ingresados
 	const int NumDigitos = 10;//Número de dígitos requeridos en el formato de cédula usado
-	int IndCaracter = 0;//Contador usado para reccorer los elementos de la cadena ingresada
 	bool CaracteresNumericos = true;//Almacena estado de validez de datos ingresados en cuanto asi son numéricos en su totalidad o no
 	bool CedulaValida = false;//Almacena estado de validez de datos ingresados
 
 	cout << "Formato de respuesta: (10 Dígitos | Solo números)\n"
 	"Número de cédula: ";
 	do {
+		CaracteresNumericos = true;//Reinicio de boleano que almacena el estado de validez de datos ingresados en cuanto asi son numéricos en su totalidad o no 
 		getline(cin, Intento, '\n');
-		while (IndCaracter < Intento.length()) {
-			if (!ValidarCaracterNumerico(Intento[IndCaracter])) {
+		for (int IndCaracter = 0 ; IndCaracter < Intento.length() ; IndCaracter++) {
+			if ( !ValidarCaracterNumerico(Intento[IndCaracter]) ) {
 				CaracteresNumericos = false;
 			}
-			IndCaracter++;
-		}//Fin while que recorre la string digitada para validar caracter por caracter que el dato ingresado sea numérico
-		CedulaValida = (CaracteresNumericos && Intento.length() == 10);
+		}//For que recorre la string digitada para validar caracter por caracter que el dato ingresado sea numérico
+		CedulaValida = (CaracteresNumericos && Intento.length() == NumDigitos);
 		if (!CedulaValida) {
 			cout << "\n\n   ***ERROR, DATOS INGRESADOS INVÁLIDOS***\n\n"
 			"Formato de respuesta: (10 Dígitos | Solo números)\n"
@@ -218,20 +217,19 @@ string LeerValidandoCedula() {
 
 string LeerValidandoNombre() {
 	string Intento;//Almacena los datos ingresados
-	int IndCaracter = 0;//Contador usado para reccorer los elementos de la cadena ingresada
-	bool NombreValido = true;//Almacena estado de validez de datos ingresadoS
+	bool NombreValido = true;//Almacena estado de validez de datos ingresados
 
 	cout << "Formato de respuesta: (No se aceptan espacios en blanco)\n"
 	"Nombre del Jugador: ";
 
 	do {
+		NombreValido = true;//Reincio de boleano que almacena estado de validez de datos ingresados
 		getline(cin, Intento, '\n');
-		while (IndCaracter < Intento.length()) { {
+		for (int IndCaracter = 0; IndCaracter < Intento.length() ; IndCaracter++) {
 			if (Intento[IndCaracter] == ' ') {
 				NombreValido = false;
 			}
-			IndCaracter++;
-		}//Fin while que recorre la string digitada para validar caracter por caracter que el dato ingresado no contenga ningún espacio en blanco
+		}//For que recorre la string digitada para validar caracter por caracter que el dato ingresado no contenga espacios en blanco
 
 		if (!NombreValido) {
 			cout << "\n\n   ***ERROR, DATOS INGRESADOS INVÁLIDOS***\n\n"
@@ -245,16 +243,16 @@ string LeerValidandoNombre() {
 
 int BuscarRegistro(string Dato, string Direccion, int NumCampo) {
 	VerificarArchivoSistema(Direccion);
-	int Registro = 1;
-	while (ObtenerCampo(Direccion, Registro, NumCampo) != "\n\n") {
+	int NumRegistro = 1;
+	while (ObtenerCampo(Direccion, NumRegistro, NumCampo) != "\n\n") {
 		VerificarArchivoSistema(Direccion);
-		if (ObtenerCampo(Direccion, Registro, NumCampo) == Dato) {
-			return Registro;
-		}
-		Registro++;
-	}
+		if (ObtenerCampo(Direccion, NumRegistro, NumCampo) == Dato) {
+			return NumRegistro;
+		}//Fin if que retorna el número del registro en caso de que corresponda al que contenga a Dato en el campo número NumCampo
+		NumRegistro++;
+	}//Fin while que recorre todos los campos con el número especificado del archivo especificado
 	return 0;
-}
+}//Función que lee una cadena validando que no contenga ningún caracter de espacio en blanco 
 
 void VerificarArchivoSistema(string Direccion) {
 	ifstream Archivo(Direccion);
@@ -268,10 +266,10 @@ void VerificarArchivoSistema(string Direccion) {
 			"Verifique la existencia de los archivos:\n\n      *Sinónimos\n      *Antónimos\n      *Diptongos\n      *Hiatos\n\nY luego vuelva a ejecutar el programa";
 			Archivo.close();
 			exit(0);
-		}
-	}
+		}//Fin if-else que cierra la jecución si la apertura fallida fue de un archivo de sistema o crea uno nuevo si no
+	}//Fin if que verifica si falló la apertura del archivo
 	Archivo.close();
-}//Función que intenta abrir como lectura un archivo para verificar su existencia, si falla verifica que si es un archivo de sistema para finalizar ejecución o crearlo si no 
+}//Función que intenta abrir como lectura un archivo para verificar su existencia, si falla verifica si es un archivo de sistema para finalizar ejecución o crearlo si no 
 
 string ObtenerCampo(string Direccion, int NumRegistro, int NumCampo) {
 	string LecturaRegistro;
