@@ -6,7 +6,14 @@ int MenuPrincipal();//Función que imprime el menú y retorna elección del usua
 bool ValidarCaracterNumerico(char Carcater);//Algoritmo de búsqueda lineal que retorna true solo si el caracter se valida como dato numérico
 int ConvertirChar(char Caracter);//Función que recibe un caracter numérico y retorna su quivalente en tipo int
 char LeerValidandoChar(char ValorPosible1, char ValorPosible2);//Función que lee un caracter validando que tome uno de los 2 valores especificados en los argumentos
-string LeerValidandoCedula();
+void RegistrarDatosUsuario();//Función que verifica que la cédula ingresada no esté ya registrada y registra los datos de ser el caso
+string LeerValidandoCedula();//Función que lee una cadena validando que solo tenga caracteres númericos y sean 10
+string LeerValidandoNombre();//Función que lee una cadena validando que no contenga ningún caracter de espacio en blanco 
+int BuscarRegistro(string Dato, string Direccion, int NumCampo);//Algoritmo de búsqueda lineal del registro que contiene el dato especificado, del archivo especificado, sobre los campos indicados en el tercer argumento
+void VerificarArchivoSistema(string Direccion);//Función que intenta abrir como lectura un archivo para verificar su existencia, si falla verifica que si es un archivo de sistema para finalizar ejecución o crearlo si no 
+string ObtenerCampo(string Direccion, int NumRegistro, int NumCampo);//Función que retorna el dato ubicado en el archivo, registro y campo especificado
+
+
 
 int main() {
 	setlocale(LC_CTYPE,"");
@@ -28,11 +35,19 @@ int main() {
 		switch (EleccionMenu) {
 		case (1):
 			//Mecánica ingresar jugadores
-			cout <<	"****************************************************************\n";
-			cout.width(42);
-			cout <<right<< "Ingresar Jugadores\n";
-			cout << "****************************************************************\n\n";
-			RegistrarCedula();
+			char SeguirIngresando;
+			do {	
+				system("cls");
+				cout <<	"****************************************************************\n";
+				cout.width(42);
+				cout <<right<< "Ingresar Jugadores\n";
+				cout << "****************************************************************\n\n";
+				RegistrarDatosUsuario();
+				cout << "Formato de respuesta: S/N\n"
+				"¿Desea ingresar otro jugador?: ";
+				SeguirIngresando = LeerValidandoChar('S', 'N');
+			} while (SeguirIngresando == 'S');
+			VolverAlMenu = true;
 			break;
 		
 		case (2):
@@ -153,51 +168,134 @@ char LeerValidandoChar(char ValorPosible1, char ValorPosible2) {
 	return ValorLeido[0];	
 }//Función que lee un caracter validando que tome uno de los 2 valores especificados en los argumentos
 
-RegistrarCedula() {
+void RegistrarDatosUsuario() {
+	
 	string Cedula;
 	string NombreJugador;
 	bool CedulaRepetida = false;
 	do {
 		Cedula = LeerValidandoCedula();
-		getline(cin, NombreJugador, '\n');
-		CedulaRepetida = EncontrarCedula(Cedula);
+		NombreJugador = LeerValidandoNombre();
+		CedulaRepetida = BuscarRegistro(Cedula, "Registros_jugadores.txt", 1);
 		if (CedulaRepetida) {
 			cout << "  ***El jugador ya existe, la cédula ya fue registrada anteriormente, intentelo de nuevo***\n\n";
 		} else {
-			cout << "El jugador ha sido registrado correctamente\n\n";
+			cout << "El jugador ha sido registrado correctamente!!!\n\n";
 			ofstream archivo("Registros_jugadores.txt", ios::app);
-			archivo << Cedula+' '+NombreJugador+' '+'0'+' '+'\n';
+			archivo << Cedula+' '+NombreJugador+' '+'0'+' '+'0'+' '+'\n';
+			archivo.close();
 		}
 	} while (CedulaRepetida);
-	
-	
-
-}
+}//Función que verifica que cada cédula ingresada no esté ya registrada y registra los datos de ser el caso
 
 string LeerValidandoCedula() {
-	string Intento;
+	string Intento;//Almacena los datos ingresados
 	const int NumDigitos = 10;//Número de dígitos requeridos en el formato de cédula usado
-	int IndCaracter = 0;
+	int IndCaracter = 0;//Contador usado para reccorer los elementos de la cadena ingresada
 	bool CaracteresNumericos = true;//Almacena estado de validez de datos ingresados en cuanto asi son numéricos en su totalidad o no
 	bool CedulaValida = false;//Almacena estado de validez de datos ingresados
-	
+
+	cout << "Formato de respuesta: (10 Dígitos | Solo números)\n"
+	"Número de cédula: ";
 	do {
-		cout << "Formato de respuesta: (10 Dígitos | Solo números)\n"
-		"Número de cédula: ";
 		getline(cin, Intento, '\n');
-		while (Intento[IndCaracter] != '\n') {
+		while (IndCaracter < Intento.length()) {
 			if (!ValidarCaracterNumerico(Intento[IndCaracter])) {
 				CaracteresNumericos = false;
 			}
 			IndCaracter++;
-		}
+		}//Fin while que recorre la string digitada para validar caracter por caracter que el dato ingresado sea numérico
 		CedulaValida = (CaracteresNumericos && Intento.length() == 10);
 		if (!CedulaValida) {
 			cout << "\n\n   ***ERROR, DATOS INGRESADOS INVÁLIDOS***\n\n"
 			"Formato de respuesta: (10 Dígitos | Solo números)\n"
 			"Número de cédula: ";
-		}
+		}//Fin if que muestra mensaje de error de ser necesario
 	} while (!CedulaValida);
 	cout << "\n\n";
 	return Intento;
+}//Función que lee una cadena validando que solo tenga caracteres númericos y sean 10 
+
+string LeerValidandoNombre() {
+	string Intento;//Almacena los datos ingresados
+	int IndCaracter = 0;//Contador usado para reccorer los elementos de la cadena ingresada
+	bool NombreValido = true;//Almacena estado de validez de datos ingresadoS
+
+	cout << "Formato de respuesta: (No se aceptan espacios en blanco)\n"
+	"Nombre del Jugador: ";
+
+	do {
+		getline(cin, Intento, '\n');
+		while (IndCaracter < Intento.length()) { {
+			if (Intento[IndCaracter] == ' ') {
+				NombreValido = false;
+			}
+			IndCaracter++;
+		}//Fin while que recorre la string digitada para validar caracter por caracter que el dato ingresado no contenga ningún espacio en blanco
+
+		if (!NombreValido) {
+			cout << "\n\n   ***ERROR, DATOS INGRESADOS INVÁLIDOS***\n\n"
+			"Formato de respuesta: (No se aceptan espacios en blanco)\n"
+			"Nombre del Jugador: ";
+		}//Fin if que muestra mensaje de error de ser necesario
+	} while (!NombreValido);
+	cout << "\n\n";
+	return Intento;
+}//Función que lee una cadena validando que no contenga ningún caracter de espacio en blanco
+
+int BuscarRegistro(string Dato, string Direccion, int NumCampo) {
+	VerificarArchivoSistema(Direccion);
+	int Registro = 1;
+	while (ObtenerCampo(Direccion, Registro, NumCampo) != "\n\n") {
+		VerificarArchivoSistema(Direccion);
+		if (ObtenerCampo(Direccion, Registro, NumCampo) == Dato) {
+			return Registro;
+		}
+		Registro++;
+	}
+	return 0;
 }
+
+void VerificarArchivoSistema(string Direccion) {
+	ifstream Archivo(Direccion);
+	if (Archivo.fail()) {
+		if (Direccion == "Registros_jugadores.txt") {
+			ofstream NuevoArchivo(Direccion);
+			NuevoArchivo.close();
+		} else {
+			system("cls");
+			cout <<"\n\n\n   ***ERROR: UN ARCHIVO DEL SISTEMA HA SIDO ELIMINADO***\n\n\n"
+			"Verifique la existencia de los archivos:\n\n      *Sinónimos\n      *Antónimos\n      *Diptongos\n      *Hiatos\n\nY luego vuelva a ejecutar el programa";
+			Archivo.close();
+			exit(0);
+		}
+	}
+	Archivo.close();
+}//Función que intenta abrir como lectura un archivo para verificar su existencia, si falla verifica que si es un archivo de sistema para finalizar ejecución o crearlo si no 
+
+string ObtenerCampo(string Direccion, int NumRegistro, int NumCampo) {
+	string LecturaRegistro;
+	string LecturaCampo;
+	int Indice = 0;
+	ifstream Archivo(Direccion);
+		
+	for (int Registro = 0 ; Registro < NumRegistro ; Registro++) {
+		if (!Archivo.eof()) {
+			getline(Archivo, LecturaRegistro, '\n');
+		} else {
+			Archivo.close();
+			return "\n\n";
+		}
+	}//Fin for que obtiene el registro correspondiente del archivo
+
+	for(int Campo = 0 ; Campo < NumCampo ; Campo++) {
+		LecturaCampo = "";
+		while (LecturaRegistro[Indice] != ' ') {
+			LecturaCampo += LecturaRegistro[Indice];
+			Indice++;
+		}
+		Indice++;
+	}//Fin for que obtiene el campo correspondiente del registro leído
+	Archivo.close();
+	return LecturaCampo;
+}//Función que retorna el dato ubicado en el archivo, registro y campo especificado
