@@ -1,5 +1,6 @@
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 using namespace std;
 
 int MenuPrincipal();//Función que imprime el menú y retorna elección del usuario
@@ -14,6 +15,7 @@ void VerificarArchivoSistema(string Direccion);//Función que intenta abrir como
 string ObtenerCampo(string Direccion, int NumRegistro, int NumCampo);//Función que retorna el dato ubicado en el archivo, registro y campo especificado
 
 
+void ReporteJugadores();//Función genera reporte de jugadores
 
 int main() {
 	setlocale(LC_CTYPE,"");
@@ -66,6 +68,15 @@ int main() {
 		
 		case (4):
 			//Mostrar reporte de jugadores
+			cout <<	"****************************************************************\n";
+			cout.width(43);
+			cout <<right<< "Reporte de jugadores\n";
+			cout << "****************************************************************\n\n";
+			ReporteJugadores();
+			cout << "Formato de respuesta: S/N\n"
+			"¿Desea volver al menú principal?"
+			"Su respuesta: ";
+			VolverAlMenu = ( LeerValidandoChar('S', 'N') == 'S' ?true:false);
 			break;
 		
 		case (5):
@@ -297,3 +308,18 @@ string ObtenerCampo(string Direccion, int NumRegistro, int NumCampo) {
 	Archivo.close();
 	return LecturaCampo;
 }//Función que retorna el dato ubicado en el archivo, registro y campo especificado
+
+void ReporteJugadores() {
+	const int DatosPorRegistro = 2;//Cantidad de datos a imprimir por cada registro leído
+	int NumRegistro = 0;//Contador que almacena el número de registro a ser leído
+ 	ifstream Registros();
+
+	cout << setw(41) << left << "Nombre del Jugador" << " | " << "Número de cédula" << endl;
+	while ( ObtenerCampo("Registros_jugadores.txt", ++NumRegistro, 1 ) != "\n\n" ) {
+		for (int NumCamposLeidos = 0 ; NumCamposLeidos < DatosPorRegistro ; NumCamposLeidos++ ) {
+			cout << setw(41) << ObtenerCampo( "Registros_jugadores.txt", NumRegistro,(NumCamposLeidos?1:2) ) << (NumCamposLeidos?"\n":" | ");
+		}
+	}//Fin while que recorre los registros imprimiendo el campo de la cédula o del nombre del jugador en cada ciclo según la paridad del contador
+}//Función genera reporte de jugadores
+
+
