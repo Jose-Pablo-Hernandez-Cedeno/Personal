@@ -45,8 +45,9 @@ int main() {
 				cout <<right<< "Ingresar Jugadores\n";
 				cout << "****************************************************************\n\n";
 				RegistrarDatosUsuario();
-				cout << "Formato de respuesta: S/N\n"
-				"¿Desea ingresar otro jugador?: ";
+				cout << "¿Desea ingresar otro jugador?\n"
+				"Formato de respuesta: S/N\n"
+				"Su respuesta: ";
 				SeguirIngresando = LeerValidandoChar('S', 'N');
 			} while (SeguirIngresando == 'S');
 			VolverAlMenu = true;
@@ -73,8 +74,8 @@ int main() {
 			cout <<right<< "Reporte de jugadores\n";
 			cout << "****************************************************************\n\n";
 			ReporteJugadores();
-			cout << "Formato de respuesta: S/N\n"
-			"¿Desea volver al menú principal?"
+			cout << "¿Desea volver al menú principal?\n"
+			"Formato de respuesta: S/N\n"
 			"Su respuesta: ";
 			VolverAlMenu = ( LeerValidandoChar('S', 'N') == 'S' ?true:false);
 			break;
@@ -287,11 +288,9 @@ string ObtenerCampo(string Direccion, int NumRegistro, int NumCampo) {
 	string LecturaCampo;
 	int Indice = 0;
 	ifstream Archivo(Direccion);
-		
+
 	for (int Registro = 0 ; Registro < NumRegistro ; Registro++) {
-		if (!Archivo.eof()) {
-			getline(Archivo, LecturaRegistro, '\n');
-		} else {
+		if ( !getline(Archivo, LecturaRegistro, '\n') ) {
 			Archivo.close();
 			return "\n\n";
 		}
@@ -320,6 +319,5 @@ void ReporteJugadores() {
 			cout << setw(41) << ObtenerCampo( "Registros_jugadores.txt", NumRegistro,(NumCamposLeidos?1:2) ) << (NumCamposLeidos?"\n":" | ");
 		}
 	}//Fin while que recorre los registros imprimiendo el campo de la cédula o del nombre del jugador en cada ciclo según la paridad del contador
+	cout << "\n";
 }//Función genera reporte de jugadores
-
-
