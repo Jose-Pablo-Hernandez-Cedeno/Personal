@@ -89,7 +89,7 @@ int main() {
 		case (5):
 			//Mostrar los 10 mejores jugadores
 
-			//añadir verif existencia de jugadores.txt
+			VerificarArchivoSistema("Registros_jugadores.txt");
 
 			MostrarMejoresJugadores();
 			break;
@@ -182,25 +182,6 @@ int ConvertirString(string Cadena) {
 	return DatoInt;
 }//Función que recibe una cadena de caracteres numéricos y retorna su quivalente en tipo int
 
-string ConvertirNum(int Numero) {
-	int Faltante = Numero;
-	int Digito = 0;
-	string DatoString;
-	const int CantCaracNumericos = 10;//Cantidad total de posibles caracteres númericos
-	char CaracterNumerico[CantCaracNumericos] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};//Arreglo de posibles caracteres numéricos
-
-	while (Faltante != 0) {
-		Faltante /= 10;
-		Digito = Faltante % 10;
-		for (int Indice = 0 ; Indice < CantCaracNumericos ; Indice++) {
-			if (Digito == Indice) {
-				DatoString += CaracterNumerico[Indice];
-			}
-		}
-	}
-	return DatoString;
-}
-
 char LeerValidandoChar(char ValorPosible1, char ValorPosible2) {
 	string ValorLeido;//Almacena todos los datos ingresados para efectuar validación de los mismos
 	char RespuestaValida;//Almacena estado de validez de datos ingresados
@@ -236,12 +217,6 @@ void RegistrarDatosUsuario() {
 }//Función que verifica que cada cédula ingresada no esté ya registrada y registra los datos de ser el caso
 
 void NuevoRegistro(string Direccion, string ContenidoRegistro) {
-	ofstream archivo(Direccion, ios::app);
-	archivo << ContenidoRegistro;
-	archivo.close();
-}
-
-void NuevoRegistro(string Direccion, int ContenidoRegistro) {
 	ofstream archivo(Direccion, ios::app);
 	archivo << ContenidoRegistro;
 	archivo.close();
@@ -313,19 +288,6 @@ int BuscarRegistro(string Dato, string Direccion, int NumCampo) {
 	return 0;
 }//Función que lee una cadena validando que no contenga ningún caracter de espacio en blanco 
 
-int BuscarRegistro(int Dato, string Direccion, int NumCampo) {
-	VerificarArchivoSistema(Direccion);
-	int NumRegistro = 1;
-	while (ObtenerCampo(Direccion, NumRegistro, NumCampo) != "\n\n") {
-		VerificarArchivoSistema(Direccion);
-		if ( ConvertirString(ObtenerCampo(Direccion, NumRegistro, NumCampo)) == Dato ) {
-			return NumRegistro;
-		}//Fin if que retorna el número del registro en caso de que corresponda al que contenga a Dato en el campo número NumCampo
-		NumRegistro++;
-	}//Fin while que recorre todos los campos con el número especificado del archivo especificado
-	return 0;
-}//Función que lee una cadena validando que no contenga ningún caracter de espacio en blanco 
-
 void VerificarArchivoSistema(string Direccion) {
 	ifstream Archivo(Direccion);
 	if (Archivo.fail()) {
@@ -371,7 +333,7 @@ string ObtenerCampo(string Direccion, int NumRegistro, int NumCampo) {
 void ReporteJugadores() {
 	const int DatosPorRegistro = 2;//Cantidad de datos a imprimir por cada registro leído
 	int NumRegistro = 0;//Contador que almacena el número de registro a ser leído
- 	ifstream Registros();
+ 	ifstream Registros;
 
 	cout << setw(41) << left << "Nombre del Jugador" << " | " << "Número de cédula" << endl;
 	while ( ObtenerCampo("Registros_jugadores.txt", ++NumRegistro, 1 ) != "\n\n" ) {
@@ -383,34 +345,32 @@ void ReporteJugadores() {
 }//Función genera reporte de jugadores
 
 void OrdenarRegistros() {
-	int RegistrosLeidos = 0;
 	ofstream archivo("temp.txt");
 	archivo.close();
+	int RegistrosLeidos = 0;
 
 	while( ObtenerCampo("Registros_jugadores.txt", ++RegistrosLeidos, 1) != "\n\n" ) {
 		int NumRegistro = 0;
-		string Candidato;//Almacena el valor leído de
-		int CandidatoInt = 0;
-		int MayorEncontrado = 0;
-		int NumRegistroMayorEncontrado = 1;
+		int PuntajeLeidoInt = 0;
+		int MayorPuntaje = 0;
+		int NumRegistroMejorPuntaje = 0;
 		while( ObtenerCampo("Registros_jugadores.txt", ++NumRegistro, 1) != "\n\n" ) {
-			Candidato = ObtenerCampo("Registros_jugadores.txt", NumRegistro, 3);
-			CandidatoInt = ConvertirString(Candidato);
-
+			PuntajeLeidoInt = ConvertirString(ObtenerCampo("Registros_jugadores.txt", NumRegistro, 3));
 			if (NumRegistro == 1) {
-				MayorEncontrado = CandidatoInt;
-				NumRegistroMayorEncontrado = NumRegistro;
-			} else if ( MayorEncontrado < CandidatoInt && !BuscarRegistro(NumRegistro, "temp.txt", 1) ) {
-				MayorEncontrado = CandidatoInt;
-				NumRegistroMayorEncontrado = NumRegistro;
+				MayorPuntaje = PuntajeLeidoInt;
+				NumRegistroMejorPuntaje = NumRegistro;
+			} else if ( PuntajeLeidoInt > MayorPuntaje && !BuscarRegistro(ConvertirNum(NumRegistro), "temp.txt", 1) ) {
+				MayorPuntaje = PuntajeLeidoInt;
+				NumRegistroMejorPuntaje = NumRegistro;
 			}
 		}
-		VerificarArchivoSistema("temp.txt");
-		NuevoRegistro("temp.txt", ConvertirNum(NumRegistroMayorEncontrado)+' '+'\n');
+		if (!BuscarRegistro(ConvertirNum(NumRegistroMejorPuntaje), "temp.txt", 1)) {
+			NuevoRegistro("temp.txt", ConvertirNum(NumRegistroMejorPuntaje)+' '+'\n');
+		}
+		
 		int NumRegistroVerif = 0;
-		while ( ObtenerCampo("Registros_jugadores.txt", ++NumRegistroVerif, 1) != "\n\n" ) {
-			if ( !BuscarRegistro(NumRegistroVerif, "temp.txt", 1) && ConvertirString( ObtenerCampo("Registros_jugadores.txt", NumRegistroVerif, 3) ) == MayorEncontrado && NumRegistroVerif != NumRegistroMayorEncontrado ) {
-				VerificarArchivoSistema("temp.txt");
+		while ( ObtenerCampo("Registros_jugadores.txt", ++NumRegistroVerif, 1) != "\n\n") {
+			if ( ConvertirString( ObtenerCampo("Registros_jugadores.txt", NumRegistroVerif, 3) ) == MayorPuntaje && !BuscarRegistro(ConvertirNum(NumRegistroVerif), "temp.txt", 1)) {
 				NuevoRegistro("temp.txt", ConvertirNum(NumRegistroVerif)+' '+'\n');
 			}
 		}
