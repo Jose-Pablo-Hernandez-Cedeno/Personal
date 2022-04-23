@@ -1,21 +1,27 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
+#include <math.h>
 using namespace std;
 
 int MenuPrincipal();//Función que imprime el menú y retorna elección del usuario
 bool ValidarCaracterNumerico(char Carcater);//Algoritmo de búsqueda lineal que retorna true solo si el caracter se valida como dato numérico
 int ConvertirChar(char Caracter);//Función que recibe un caracter numérico y retorna su quivalente en tipo int
+int ConvertirString(string Cadena);//Función que recibe una cadena de caracteres numéricos y retorna su quivalente en tipo int
+string ConvertirNum(int Numero);//
 char LeerValidandoChar(char ValorPosible1, char ValorPosible2);//Función que lee un caracter validando que tome uno de los 2 valores especificados en los argumentos
 void RegistrarDatosUsuario();//Función que verifica que la cédula ingresada no esté ya registrada y registra los datos de ser el caso
+void NuevoRegistro(string Direccion, string ContenidoRegistro);//Función que escribe un nuevo registro con el contenido especificado en el archivo
 string LeerValidandoCedula();//Función que lee una cadena validando que solo tenga caracteres númericos y sean 10
 string LeerValidandoNombre();//Función que lee una cadena validando que no contenga ningún caracter de espacio en blanco 
 int BuscarRegistro(string Dato, string Direccion, int NumCampo);//Algoritmo de búsqueda lineal del registro que contiene el dato especificado, del archivo especificado, sobre los campos indicados en el tercer argumento
-void VerificarArchivoSistema(string Direccion);//Función que intenta abrir como lectura un archivo para verificar su existencia, si falla verifica que si es un archivo de sistema para finalizar ejecución o crearlo si no 
+void VerificarArchivoSistema(string Direccion);//Función que intenta abrir un archivo para verificar su existencia, si falla verifica que si es un archivo de sistema para finalizar ejecución o crearlo si no 
 string ObtenerCampo(string Direccion, int NumRegistro, int NumCampo);//Función que retorna el dato ubicado en el archivo, registro y campo especificado
-
-
 void ReporteJugadores();//Función genera reporte de jugadores
+void OrdenarRegistros();
+void MostrarMejoresJugadores();//
+
+
 
 int main() {
 	setlocale(LC_CTYPE,"");
@@ -82,6 +88,10 @@ int main() {
 		
 		case (5):
 			//Mostrar los 10 mejores jugadores
+
+			//añadir verif existencia de jugadores.txt
+
+			MostrarMejoresJugadores();
 			break;
 		
 		case (6):
@@ -164,6 +174,33 @@ int ConvertirChar(char Caracter) {
 	}//Fin for que recorre los elementos del Arreglo de posibles caracteres numéricos
 }//Fin función que recibe un caracter numérico y retorna su quivalente en tipo int
 
+int ConvertirString(string Cadena) {
+	int DatoInt = 0;//Almacena el resultado de la conversión
+	for(int NumCaracter = 0 ; NumCaracter < Cadena.length() ; NumCaracter++) {
+		DatoInt += ConvertirChar(Cadena[NumCaracter])*pow(10, NumCaracter);
+	}
+	return DatoInt;
+}//Función que recibe una cadena de caracteres numéricos y retorna su quivalente en tipo int
+
+string ConvertirNum(int Numero) {
+	int Faltante = Numero;
+	int Digito = 0;
+	string DatoString;
+	const int CantCaracNumericos = 10;//Cantidad total de posibles caracteres númericos
+	char CaracterNumerico[CantCaracNumericos] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};//Arreglo de posibles caracteres numéricos
+
+	while (Faltante != 0) {
+		Faltante /= 10;
+		Digito = Faltante % 10;
+		for (int Indice = 0 ; Indice < CantCaracNumericos ; Indice++) {
+			if (Digito == Indice) {
+				DatoString += CaracterNumerico[Indice];
+			}
+		}
+	}
+	return DatoString;
+}
+
 char LeerValidandoChar(char ValorPosible1, char ValorPosible2) {
 	string ValorLeido;//Almacena todos los datos ingresados para efectuar validación de los mismos
 	char RespuestaValida;//Almacena estado de validez de datos ingresados
@@ -193,12 +230,22 @@ void RegistrarDatosUsuario() {
 			cout << "  ***El jugador ya existe en el registro, intentelo de nuevo***\n\n";
 		} else {
 			cout << "El jugador ha sido registrado correctamente!!!\n\n";
-			ofstream archivo("Registros_jugadores.txt", ios::app);
-			archivo << Cedula+' '+NombreJugador+' '+'0'+' '+'0'+' '+'\n';
-			archivo.close();
+			NuevoRegistro("Registros_jugadores.txt", Cedula+' '+NombreJugador+' '+'0'+' '+'\n');
 		}
 	} while (CedulaRepetida);
 }//Función que verifica que cada cédula ingresada no esté ya registrada y registra los datos de ser el caso
+
+void NuevoRegistro(string Direccion, string ContenidoRegistro) {
+	ofstream archivo(Direccion, ios::app);
+	archivo << ContenidoRegistro;
+	archivo.close();
+}
+
+void NuevoRegistro(string Direccion, int ContenidoRegistro) {
+	ofstream archivo(Direccion, ios::app);
+	archivo << ContenidoRegistro;
+	archivo.close();
+}
 
 string LeerValidandoCedula() {
 	string Intento;//Almacena los datos ingresados
@@ -266,10 +313,23 @@ int BuscarRegistro(string Dato, string Direccion, int NumCampo) {
 	return 0;
 }//Función que lee una cadena validando que no contenga ningún caracter de espacio en blanco 
 
+int BuscarRegistro(int Dato, string Direccion, int NumCampo) {
+	VerificarArchivoSistema(Direccion);
+	int NumRegistro = 1;
+	while (ObtenerCampo(Direccion, NumRegistro, NumCampo) != "\n\n") {
+		VerificarArchivoSistema(Direccion);
+		if ( ConvertirString(ObtenerCampo(Direccion, NumRegistro, NumCampo)) == Dato ) {
+			return NumRegistro;
+		}//Fin if que retorna el número del registro en caso de que corresponda al que contenga a Dato en el campo número NumCampo
+		NumRegistro++;
+	}//Fin while que recorre todos los campos con el número especificado del archivo especificado
+	return 0;
+}//Función que lee una cadena validando que no contenga ningún caracter de espacio en blanco 
+
 void VerificarArchivoSistema(string Direccion) {
 	ifstream Archivo(Direccion);
 	if (Archivo.fail()) {
-		if (Direccion == "Registros_jugadores.txt") {
+		if (Direccion == "Registros_jugadores.txt" || Direccion == "temp.txt") {
 			ofstream NuevoArchivo(Direccion);
 			NuevoArchivo.close();
 		} else {
@@ -281,31 +341,31 @@ void VerificarArchivoSistema(string Direccion) {
 		}//Fin if-else que cierra la jecución si la apertura fallida fue de un archivo de sistema o crea uno nuevo si no
 	}//Fin if que verifica si falló la apertura del archivo
 	Archivo.close();
-}//Función que intenta abrir como lectura un archivo para verificar su existencia, si falla verifica si es un archivo de sistema para finalizar ejecución o crearlo si no 
+}//Función que intenta abrir un archivo para verificar su existencia, si falla verifica si es un archivo de sistema para finalizar ejecución o crearlo si no 
 
 string ObtenerCampo(string Direccion, int NumRegistro, int NumCampo) {
-	string LecturaRegistro;
-	string LecturaCampo;
+	string CandidatoRegistro;
+	string CandidatoCampo;
 	int Indice = 0;
 	ifstream Archivo(Direccion);
 
 	for (int Registro = 0 ; Registro < NumRegistro ; Registro++) {
-		if ( !getline(Archivo, LecturaRegistro, '\n') ) {
+		if ( !getline(Archivo, CandidatoRegistro, '\n') ) {
 			Archivo.close();
 			return "\n\n";
 		}
 	}//Fin for que obtiene el registro correspondiente del archivo
 
 	for(int Campo = 0 ; Campo < NumCampo ; Campo++) {
-		LecturaCampo = "";
-		while (LecturaRegistro[Indice] != ' ') {
-			LecturaCampo += LecturaRegistro[Indice];
+		CandidatoCampo = "";
+		while (CandidatoRegistro[Indice] != ' ') {
+			CandidatoCampo += CandidatoRegistro[Indice];
 			Indice++;
 		}
 		Indice++;
 	}//Fin for que obtiene el campo correspondiente del registro leído
 	Archivo.close();
-	return LecturaCampo;
+	return CandidatoCampo;
 }//Función que retorna el dato ubicado en el archivo, registro y campo especificado
 
 void ReporteJugadores() {
@@ -321,3 +381,48 @@ void ReporteJugadores() {
 	}//Fin while que recorre los registros imprimiendo el campo de la cédula o del nombre del jugador en cada ciclo según la paridad del contador
 	cout << "\n";
 }//Función genera reporte de jugadores
+
+void OrdenarRegistros() {
+	int RegistrosLeidos = 0;
+	ofstream archivo("temp.txt");
+	archivo.close();
+
+	while( ObtenerCampo("Registros_jugadores.txt", ++RegistrosLeidos, 1) != "\n\n" ) {
+		int NumRegistro = 0;
+		string Candidato;//Almacena el valor leído de
+		int CandidatoInt = 0;
+		int MayorEncontrado = 0;
+		int NumRegistroMayorEncontrado = 1;
+		while( ObtenerCampo("Registros_jugadores.txt", ++NumRegistro, 1) != "\n\n" ) {
+			Candidato = ObtenerCampo("Registros_jugadores.txt", NumRegistro, 3);
+			CandidatoInt = ConvertirString(Candidato);
+
+			if (NumRegistro == 1) {
+				MayorEncontrado = CandidatoInt;
+				NumRegistroMayorEncontrado = NumRegistro;
+			} else if ( MayorEncontrado < CandidatoInt && !BuscarRegistro(NumRegistro, "temp.txt", 1) ) {
+				MayorEncontrado = CandidatoInt;
+				NumRegistroMayorEncontrado = NumRegistro;
+			}
+		}
+		VerificarArchivoSistema("temp.txt");
+		NuevoRegistro("temp.txt", ConvertirNum(NumRegistroMayorEncontrado)+' '+'\n');
+		int NumRegistroVerif = 0;
+		while ( ObtenerCampo("Registros_jugadores.txt", ++NumRegistroVerif, 1) != "\n\n" ) {
+			if ( !BuscarRegistro(NumRegistroVerif, "temp.txt", 1) && ConvertirString( ObtenerCampo("Registros_jugadores.txt", NumRegistroVerif, 3) ) == MayorEncontrado && NumRegistroVerif != NumRegistroMayorEncontrado ) {
+				VerificarArchivoSistema("temp.txt");
+				NuevoRegistro("temp.txt", ConvertirNum(NumRegistroVerif)+' '+'\n');
+			}
+		}
+	}
+}
+
+void MostrarMejoresJugadores() {
+
+	OrdenarRegistros();
+	int NumRegistro = 0;
+	while ( ObtenerCampo("temp.txt", ++NumRegistro, 1) != "\n\n" ) {
+		int RegistroJugador = ConvertirString( ObtenerCampo("temp.txt", NumRegistro, 1) );
+		cout <<"Jugador #" << setw(41) << left << NumRegistro << "|      " << ObtenerCampo("Registros_jugadores.txt", RegistroJugador, 2)<<endl;
+	}
+}//Función que genera reporte de los 10 mejores jugadores
