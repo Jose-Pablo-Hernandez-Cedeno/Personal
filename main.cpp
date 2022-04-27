@@ -8,33 +8,31 @@ int MenuPrincipal();//Función que imprime el menú y retorna elección del usua
 bool ValidarCaracterNumerico(char Carcater);//Algoritmo de búsqueda lineal que retorna true solo si el caracter se valida como dato numérico
 int ConvertirChar(char Caracter);//Función que recibe un caracter numérico y retorna su quivalente en tipo int
 int ConvertirString(string Cadena);//Función que recibe una cadena de caracteres numéricos y retorna su quivalente en tipo int
-string ConvertirNum(int Numero);//
+string ConvertirNum(int Numero);//Función que recibe un dato tipo int  y retorna su quivalente en forma de cadena de caracteres numéricos
 char LeerValidandoChar(char ValorPosible1, char ValorPosible2);//Función que lee un caracter validando que tome uno de los 2 valores especificados en los argumentos
 void RegistrarDatosUsuario();//Función que verifica que la cédula ingresada no esté ya registrada y registra los datos de ser el caso
 void NuevoRegistro(string Direccion, string ContenidoRegistro);//Función que escribe un nuevo registro con el contenido especificado en el archivo
 string LeerValidandoCedula();//Función que lee una cadena validando que solo tenga caracteres númericos y sean 10
-string LeerValidandoNombre();//Función que lee una cadena validando que no contenga ningún caracter de espacio en blanco 
+string LeerValidandoNombre();//Función que lee una cadena validando que no contenga ningún caracter de espacio en blanco
 int BuscarRegistro(string Dato, string Direccion, int NumCampo);//Algoritmo de búsqueda lineal del registro que contiene el dato especificado, del archivo especificado, sobre los campos indicados en el tercer argumento
-void VerificarArchivoSistema(string Direccion);//Función que intenta abrir un archivo para verificar su existencia, si falla verifica que si es un archivo de sistema para finalizar ejecución o crearlo si no 
+void VerificarArchivoSistema(string Direccion);//Función que intenta abrir un archivo para verificar su existencia, si falla verifica que si es un archivo de sistema para finalizar ejecución o crearlo si no
 string ObtenerCampo(string Direccion, int NumRegistro, int NumCampo);//Función que retorna el dato ubicado en el archivo, registro y campo especificado
-void ReporteJugadores();//Función genera reporte de jugadores
-void OrdenarRegistros();
-void MostrarMejoresJugadores();//
-
-
+void ReporteJugadores();//Función que genera el reporte de jugadores
+void MostrarMejoresJugadores();//Función que imprime los datos del archivo Registros_jugadores.txt en el orden especificado por las referencias almacenadas en un archivo temporal
+void OrdenarRegistros();//Función que genera un archivo temporal en dónde, mediante referencias a los registros originales, enlista ascendentemente, respecto a los puntajes, los registros del archivo Registros_jugadores.txt
 
 int main() {
-	setlocale(LC_CTYPE,"");
+	setlocale(LC_ALL,"Spanish");
 	system("title Proyecto Final");
 
 	int EleccionMenu = 0;//Almacena la elección del usuario para el menú en caso de cumplirse parametros de entrada
 	bool VolverAlMenu = false;//Boleano que controla si debe reiniciarse el programa y o si no
-	
+
 	do {
 		//Reinicio de variable para finalizar ejecución del programa por default al acabar ejecución del ciclo del do-while
 		system("cls");
 		VolverAlMenu = false;
-		
+
 		//Menú principal
 		EleccionMenu = MenuPrincipal();
 		system("cls");
@@ -44,7 +42,7 @@ int main() {
 		case (1):
 			//Mecánica ingresar jugadores
 			char SeguirIngresando;
-			do {	
+			do {
 				system("cls");
 				cout <<	"****************************************************************\n";
 				cout.width(42);
@@ -58,21 +56,21 @@ int main() {
 			} while (SeguirIngresando == 'S');
 			VolverAlMenu = true;
 			break;
-		
+
 		case (2):
 			//Jugar hiatos y diptongos
 			cout <<	"****************************************************************\n";
 			cout.width(45.5);
 			cout <<right<< "Jugar Hiatos y Diptongos\n";
 			cout << "****************************************************************\n\n";
-			
+
 			break;
-		
+
 		case (3):
 			//Jugar antónimos y sinónimos
 
 			break;
-		
+
 		case (4):
 			//Mostrar reporte de jugadores
 			cout <<	"****************************************************************\n";
@@ -85,15 +83,21 @@ int main() {
 			"Su respuesta: ";
 			VolverAlMenu = ( LeerValidandoChar('S', 'N') == 'S' ?true:false);
 			break;
-		
+
 		case (5):
 			//Mostrar los 10 mejores jugadores
-
+			cout <<	"****************************************************************\n";
+			cout.width(45);
+			cout <<right<< "Los 10 Mejores Jugadores\n";
+			cout << "****************************************************************\n\n";
 			VerificarArchivoSistema("Registros_jugadores.txt");
-
 			MostrarMejoresJugadores();
+			cout << endl << "¿Desean volver al menú?\n"
+			"Formato de respuesta: S/N\n"
+			"Su respuesta: ";
+			VolverAlMenu = ( LeerValidandoChar('S', 'N') == 'S' ?true:false);
 			break;
-		
+
 		case (6):
 			//Salir del programa
 			cout << "    ¿Está seguro de que desea salir del programa?\n\n"
@@ -107,7 +111,7 @@ int main() {
 				VolverAlMenu = true;
 			}//Fin if-else que finaliza la ejecución o reinicia el programa en función del boleano VolverAlMenu
 			break;
-		
+
 		default:
 			system("cls");
 			cout << " ***ALGÚN ERROR FATAL OCURRIÓ, ESTE CARTEL NUNCA DEBIÓ MOSTRARSE***\n\n"
@@ -117,7 +121,7 @@ int main() {
 		}
 		system("cls");
 	} while (VolverAlMenu);
-	
+
 	return 0;
 }
 
@@ -125,7 +129,7 @@ int MenuPrincipal() {
 	int Eleccion = 0;//Almacena la elección del usuario para el menú y es retornado en caso de cumplirse parametros de entrada
 	bool RespuestaValida = false;//Almacena estado de validez de datos ingresados
 	string InfoIngresada;//Almacena todos los datos ingresados para efectuar validación de los mismos
-	
+
 	cout <<	"****************************************************************\n*";
 	cout.width(39);
 	cout << right << "Menú Principal";
@@ -143,8 +147,8 @@ int MenuPrincipal() {
 		if (ValidarCaracterNumerico(InfoIngresada[0])) {
 			Eleccion = ConvertirChar(InfoIngresada[0]);
 			RespuestaValida = (InfoIngresada.length() == 1 && 1 <= Eleccion && Eleccion <= 6);
-		}//Fin if de validaciones de parámetros de ingreso que se efectúan en caso de haber un primer caracter numérico 
-		
+		}//Fin if de validaciones de parámetros de ingreso que se efectúan en caso de haber un primer caracter numérico
+
         if (!RespuestaValida) {
             cout << "\n\n   ***ERROR, DATOS INGRESADOS INVÁLIDOS***\n\n"
             "Digite un número para acceder a la opción: ";
@@ -177,10 +181,27 @@ int ConvertirChar(char Caracter) {
 int ConvertirString(string Cadena) {
 	int DatoInt = 0;//Almacena el resultado de la conversión
 	for(int NumCaracter = 0 ; NumCaracter < Cadena.length() ; NumCaracter++) {
-		DatoInt += ConvertirChar(Cadena[NumCaracter])*pow(10, NumCaracter);
+		DatoInt = DatoInt + ConvertirChar(Cadena[NumCaracter])*pow( 10, Cadena.length()-(NumCaracter+1) );
 	}
 	return DatoInt;
 }//Función que recibe una cadena de caracteres numéricos y retorna su quivalente en tipo int
+
+string ConvertirNum(int Numero) {
+	const int CantCaracNumericos = 10;
+	char CaracNumericos[CantCaracNumericos] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+	char CaracDigito;
+	string DatoString;
+	while ( Numero != 0 ) {
+		for ( int NumDigito = 0 ; NumDigito < CantCaracNumericos ; NumDigito++ ) {
+			if ( NumDigito == (Numero % 10) ) {
+				CaracDigito = CaracNumericos[NumDigito];
+			}
+		}
+		DatoString = CaracDigito + DatoString;
+		Numero /= 10;
+	}
+	return DatoString;
+}//Función que recibe un dato tipo int  y retorna su quivalente en forma de cadena de caracteres numéricos
 
 char LeerValidandoChar(char ValorPosible1, char ValorPosible2) {
 	string ValorLeido;//Almacena todos los datos ingresados para efectuar validación de los mismos
@@ -195,11 +216,11 @@ char LeerValidandoChar(char ValorPosible1, char ValorPosible2) {
 			"Su respuesta: ";
 		}//Fin if para mostar mensaje de error en caso de no cumplir parámetros de ingreso
 	} while(!RespuestaValida);
-	return ValorLeido[0];	
+	return ValorLeido[0];
 }//Función que lee un caracter validando que tome uno de los 2 valores especificados en los argumentos
 
 void RegistrarDatosUsuario() {
-	
+
 	string Cedula;
 	string NombreJugador;
 	bool CedulaRepetida = false;
@@ -231,7 +252,7 @@ string LeerValidandoCedula() {
 	cout << "Formato de respuesta: (10 Dígitos | Solo números)\n"
 	"Número de cédula: ";
 	do {
-		CaracteresNumericos = true;//Reinicio de boleano que almacena el estado de validez de datos ingresados en cuanto asi son numéricos en su totalidad o no 
+		CaracteresNumericos = true;//Reinicio de boleano que almacena el estado de validez de datos ingresados en cuanto asi son numéricos en su totalidad o no
 		getline(cin, Intento, '\n');
 		for (int IndCaracter = 0 ; IndCaracter < Intento.length() ; IndCaracter++) {
 			if ( !ValidarCaracterNumerico(Intento[IndCaracter]) ) {
@@ -247,7 +268,7 @@ string LeerValidandoCedula() {
 	} while (!CedulaValida);
 	cout << "\n\n";
 	return Intento;
-}//Función que lee una cadena validando que solo tenga caracteres númericos y sean 10 
+}//Función que lee una cadena validando que solo tenga caracteres númericos y sean 10
 
 string LeerValidandoNombre() {
 	string Intento;//Almacena los datos ingresados
@@ -286,7 +307,7 @@ int BuscarRegistro(string Dato, string Direccion, int NumCampo) {
 		NumRegistro++;
 	}//Fin while que recorre todos los campos con el número especificado del archivo especificado
 	return 0;
-}//Función que lee una cadena validando que no contenga ningún caracter de espacio en blanco 
+}//Función que lee una cadena validando que no contenga ningún caracter de espacio en blanco
 
 void VerificarArchivoSistema(string Direccion) {
 	ifstream Archivo(Direccion);
@@ -303,7 +324,7 @@ void VerificarArchivoSistema(string Direccion) {
 		}//Fin if-else que cierra la jecución si la apertura fallida fue de un archivo de sistema o crea uno nuevo si no
 	}//Fin if que verifica si falló la apertura del archivo
 	Archivo.close();
-}//Función que intenta abrir un archivo para verificar su existencia, si falla verifica si es un archivo de sistema para finalizar ejecución o crearlo si no 
+}//Función que intenta abrir un archivo para verificar su existencia, si falla verifica si es un archivo de sistema para finalizar ejecución o crearlo si no
 
 string ObtenerCampo(string Direccion, int NumRegistro, int NumCampo) {
 	string CandidatoRegistro;
@@ -342,7 +363,17 @@ void ReporteJugadores() {
 		}
 	}//Fin while que recorre los registros imprimiendo el campo de la cédula o del nombre del jugador en cada ciclo según la paridad del contador
 	cout << "\n";
-}//Función genera reporte de jugadores
+}//Función que genera el reporte de jugadores
+
+void MostrarMejoresJugadores() {
+
+	OrdenarRegistros();
+	int NumRegistro = 0;
+	while ( ObtenerCampo("temp.txt", ++NumRegistro, 1) != "\n\n" ) {
+		int RegistroJugador = ConvertirString( ObtenerCampo("temp.txt", NumRegistro, 1) );
+		cout <<"Jugador #" << setw(20) << left << NumRegistro << "|      " << ObtenerCampo("Registros_jugadores.txt", RegistroJugador, 2)<<endl;
+	}
+}//Función que genera reporte de los 10 mejores jugadores
 
 void OrdenarRegistros() {
 	ofstream archivo("temp.txt");
@@ -363,11 +394,13 @@ void OrdenarRegistros() {
 				MayorPuntaje = PuntajeLeidoInt;
 				NumRegistroMejorPuntaje = NumRegistro;
 			}
+
 		}
-		if (!BuscarRegistro(ConvertirNum(NumRegistroMejorPuntaje), "temp.txt", 1)) {
+
+		if ( !BuscarRegistro(ConvertirNum(NumRegistroMejorPuntaje), "temp.txt", 1) ) {
 			NuevoRegistro("temp.txt", ConvertirNum(NumRegistroMejorPuntaje)+' '+'\n');
 		}
-		
+
 		int NumRegistroVerif = 0;
 		while ( ObtenerCampo("Registros_jugadores.txt", ++NumRegistroVerif, 1) != "\n\n") {
 			if ( ConvertirString( ObtenerCampo("Registros_jugadores.txt", NumRegistroVerif, 3) ) == MayorPuntaje && !BuscarRegistro(ConvertirNum(NumRegistroVerif), "temp.txt", 1)) {
@@ -375,14 +408,4 @@ void OrdenarRegistros() {
 			}
 		}
 	}
-}
-
-void MostrarMejoresJugadores() {
-
-	OrdenarRegistros();
-	int NumRegistro = 0;
-	while ( ObtenerCampo("temp.txt", ++NumRegistro, 1) != "\n\n" ) {
-		int RegistroJugador = ConvertirString( ObtenerCampo("temp.txt", NumRegistro, 1) );
-		cout <<"Jugador #" << setw(41) << left << NumRegistro << "|      " << ObtenerCampo("Registros_jugadores.txt", RegistroJugador, 2)<<endl;
-	}
-}//Función que genera reporte de los 10 mejores jugadores
+}//Función que genera un archivo temporal en dónde, mediante referencias a los registros originales, enlista ascendentemente, respecto a los puntajes, los registros del archivo Registros_jugadores.txt
