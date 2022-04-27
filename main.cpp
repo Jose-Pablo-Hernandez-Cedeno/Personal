@@ -22,7 +22,7 @@ void MostrarMejoresJugadores();//Función que imprime los datos del archivo Regi
 void OrdenarRegistros();//Función que genera un archivo temporal en dónde, mediante referencias a los registros originales, enlista ascendentemente, respecto a los puntajes, los registros del archivo Registros_jugadores.txt
 
 int main() {
-	setlocale(LC_ALL,"Spanish");
+	setlocale(LC_CTYPE,"");
 	system("title Proyecto Final");
 
 	int EleccionMenu = 0;//Almacena la elección del usuario para el menú en caso de cumplirse parametros de entrada
@@ -40,6 +40,7 @@ int main() {
 		//Ejecución de código según elección
 		switch (EleccionMenu) {
 		case (1):
+			{
 			//Mecánica ingresar jugadores
 			char SeguirIngresando;
 			do {
@@ -56,49 +57,105 @@ int main() {
 			} while (SeguirIngresando == 'S');
 			VolverAlMenu = true;
 			break;
+			}
 
 		case (2):
+			{
 			//Jugar hiatos y diptongos
 			cout <<	"****************************************************************\n";
 			cout.width(45.5);
 			cout <<right<< "Jugar Hiatos y Diptongos\n";
 			cout << "****************************************************************\n\n";
+			ifstream PruebaLectura("Registros_jugadores.txt");
+			bool LecturaFallida = PruebaLectura.fail();
+			PruebaLectura.close();
+			if ( LecturaFallida ) {
+				cout << "ADVERTENCIA:\n"
+				"Debe registrar previamente a los jugadores para acceder al\n"
+				"juego de hiatos y diptongos\n\n";
+			} else {
+				
 
+				//codjksdf
+
+
+			}
 			break;
+			}
 
 		case (3):
+			{
 			//Jugar antónimos y sinónimos
+			cout <<	"****************************************************************\n";
+			cout.width(48.5);
+			cout <<right<< "Jugar antónimos y sinónimos\n";
+			cout << "****************************************************************\n\n";
+			ifstream PruebaLectura("Registros_jugadores.txt");
+			bool LecturaFallida = PruebaLectura.fail();
+			PruebaLectura.close();
+			if ( LecturaFallida ) {
+				cout << "ADVERTENCIA:\n"
+				"Debe registrar previamente a los jugadores para acceder al\n"
+				"juego de antónimos y sinónimos\n\n";
+			} else {
 
+
+				//codjksdf
+
+
+			}
 			break;
+			}
 
 		case (4):
+			{
 			//Mostrar reporte de jugadores
 			cout <<	"****************************************************************\n";
 			cout.width(43);
 			cout <<right<< "Reporte de jugadores\n";
 			cout << "****************************************************************\n\n";
-			ReporteJugadores();
+			ifstream PruebaLectura("Registros_jugadores.txt");
+			bool LecturaFallida = PruebaLectura.fail();
+			PruebaLectura.close();
+			if ( LecturaFallida ) {
+				cout << "ADVERTENCIA:\n"
+				"Debe registrar previamente a los jugadores para acceder al\n"
+				"reporte de jugadores\n\n";
+			} else {
+				ReporteJugadores();
+			}
 			cout << "¿Desea volver al menú principal?\n"
 			"Formato de respuesta: S/N\n"
 			"Su respuesta: ";
 			VolverAlMenu = ( LeerValidandoChar('S', 'N') == 'S' ?true:false);
 			break;
-
+			}
 		case (5):
+			{
 			//Mostrar los 10 mejores jugadores
 			cout <<	"****************************************************************\n";
 			cout.width(45);
 			cout <<right<< "Los 10 Mejores Jugadores\n";
 			cout << "****************************************************************\n\n";
-			VerificarArchivoSistema("Registros_jugadores.txt");
-			MostrarMejoresJugadores();
-			cout << endl << "¿Desean volver al menú?\n"
+			ifstream PruebaLectura("Registros_jugadores.txt");
+			bool LecturaFallida = PruebaLectura.fail();
+			PruebaLectura.close();
+			if ( LecturaFallida ) {
+				cout << "ADVERTENCIA:\n"
+				"Debe registrar previamente a los jugadores para acceder al\n"
+				"top 10 de mejores jugadores\n\n";
+			} else {
+				MostrarMejoresJugadores();
+			}
+			
+			cout << "¿Desean volver al menú?\n"
 			"Formato de respuesta: S/N\n"
 			"Su respuesta: ";
 			VolverAlMenu = ( LeerValidandoChar('S', 'N') == 'S' ?true:false);
 			break;
-
+			}
 		case (6):
+			{
 			//Salir del programa
 			cout << "    ¿Está seguro de que desea salir del programa?\n\n"
 			"Formato de respuesta: S/N\n"
@@ -111,13 +168,15 @@ int main() {
 				VolverAlMenu = true;
 			}//Fin if-else que finaliza la ejecución o reinicia el programa en función del boleano VolverAlMenu
 			break;
-
+			}
 		default:
+			{
 			system("cls");
 			cout << " ***ALGÚN ERROR FATAL OCURRIÓ, ESTE CARTEL NUNCA DEBIÓ MOSTRARSE***\n\n"
 			"                LA EJECUCIÓN HA TERMINADO AUTOMÁTICAMENTE";
 			exit(1);
 			break;
+			}
 		}
 		system("cls");
 	} while (VolverAlMenu);
@@ -373,6 +432,7 @@ void MostrarMejoresJugadores() {
 		int RegistroJugador = ConvertirString( ObtenerCampo("temp.txt", NumRegistro, 1) );
 		cout <<"Jugador #" << setw(20) << left << NumRegistro << "|      " << ObtenerCampo("Registros_jugadores.txt", RegistroJugador, 2)<<endl;
 	}
+	cout << "\n";
 }//Función que genera reporte de los 10 mejores jugadores
 
 void OrdenarRegistros() {
