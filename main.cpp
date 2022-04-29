@@ -21,8 +21,9 @@ void ReporteJugadores();//Función que genera el reporte de jugadores
 void MostrarMejoresJugadores();//Función que imprime los datos del archivo Registros_jugadores.txt en el orden especificado por las referencias almacenadas en un archivo temporal
 void OrdenarRegistros();//Función que genera un archivo temporal en dónde, mediante referencias a los registros originales, enlista ascendentemente, respecto a los puntajes, los registros del archivo Registros_jugadores.txt
 bool IngresoJugadores(string Cedula[], string Nombre[], const int NumJugadores);//Función de ingreso de usuarios que retorna true si se efectuó correctamente y false si se canceló el ingreso de datos
-void PantallaFinal(int Puntaje[], string Nombres[]);
-void ModificarCampo (string Direccion, int RegistroObjetivo, int CampoObjetivo, string NuevoValor);
+bool PantallaFinal(int Puntaje[], string Nombres[]);//Función que muestra la pantalla final
+void ModificarCampo(string Direccion, int RegistroObjetivo, int CampoObjetivo, string NuevoValor);//Función que actualiza el valor del campo especificado asignándole el valor especificado
+int ContarRegistros(string Direccion);//Función que retorna el número de registros de un archivo asumiendo que cada registro acaba en '\n'
 
 int main() {
 	setlocale(LC_CTYPE,"");
@@ -92,10 +93,18 @@ int main() {
 			char SeguirJugando = 'S';
 			int NumTurno = 0;
 
-			IngresoJugadores(CedulaJugador, NombreJugador, NumJugadores);
+			if ( !IngresoJugadores(CedulaJugador, NombreJugador, NumJugadores) ) {
+				VolverAlMenu = true;
+				break;
+			}
 			
 			do {
 				system("cls");
+				cout <<	"****************************************************************\n";
+				cout.width(45.5);
+				cout <<right<< "Jugar Hiatos y Diptongos\n";
+				cout << "****************************************************************\n\n";
+
 				for (int IndJugador = 0 ; IndJugador < NumJugadores ; IndJugador++) {
 					char Respuesta[] = {'H', 'D'};
 					int IndRespuesta = rand()%2;
@@ -128,16 +137,21 @@ int main() {
 					SeguirJugando = LeerValidandoChar('S', 'N');
 				}
 			} while (SeguirJugando == 'S' && NumTurno < 15);
-
-			if (SeguirJugando == 'N') {
-				VolverAlMenu = true;
-				break;
-			}
-
-			PantallaFinal(ContadorAciertos, NombreJugador);
 			
+			system("cls");
+			cout <<	"****************************************************************\n";
+			cout.width(45.5);
+			cout <<right<< "Jugar Hiatos y Diptongos\n";
+			cout << "****************************************************************\n\n";
+			VolverAlMenu = PantallaFinal(ContadorAciertos, NombreJugador);//Muestra la pantalla final y asigna bono al ganador si lo hay
+
 			if (ContadorAciertos[0] != ContadorAciertos[1]) {
-				ModificarCampo("ArchivoJugadores.txt", BuscarRegistro( (ContadorAciertos[0] > ContadorAciertos[1]?CedulaJugador[0]:CedulaJugador[1]), "ArchivoJugadores.txt", 1 ), 3, (ContadorAciertos[0] > ContadorAciertos[1]?ContadorAciertos[0]:ContadorAciertos[1]));
+				int NumRegistroGanador = BuscarRegistro( (ContadorAciertos[0] > ContadorAciertos[1]?CedulaJugador[0]:CedulaJugador[1]), "Registros_jugadores.txt", 1 );
+				string PuntajeActualizado= ConvertirNum( (ContadorAciertos[0] > ContadorAciertos[1]?ContadorAciertos[0]:ContadorAciertos[1])+ConvertirString(ObtenerCampo("Registros_jugadores.txt", NumRegistroGanador, 3)) );
+				ModificarCampo("Registros_jugadores.txt", NumRegistroGanador, 3, PuntajeActualizado);
+
+				cout<<"\n\n\n\n\ntxt:\n\n\n NumRegistroGanador: "<<NumRegistroGanador<<"\n"<<"PuntajeActualizado: "<<PuntajeActualizado<<"\n\n\n\n\n";
+				system("pause");
 			}//Fin if que actualiza el puntaje del jugador ganador
 
 			break;
@@ -164,14 +178,74 @@ int main() {
 				break;
 			}
 
-			VerificarArchivoSistema("Hiatos.txt");
-			VerificarArchivoSistema("Diptongos.txt");
+			VerificarArchivoSistema("Sinónimos.txt");
+			VerificarArchivoSistema("Antónimos.txt");
+			const int NumJugadores = 2;
+			string CedulaJugador[NumJugadores];
+			string NombreJugador[NumJugadores];
+			int ContadorAciertos[NumJugadores] = {0, 0};
+			char SeguirJugando = 'S';
+			int NumTurno = 0;
 
 
-			//codjksdf
+			if ( !IngresoJugadores(CedulaJugador, NombreJugador, NumJugadores) ) {
+				VolverAlMenu = true;
+				break;
+			}
 
+			do {
+				system("cls");
+				cout <<	"****************************************************************\n";
+				cout.width(48.5);
+				cout <<right<< "Jugar antónimos y sinónimos\n";
+				cout << "****************************************************************\n\n";
 
-		
+				for (int IndJugador = 0 ; IndJugador < NumJugadores ; IndJugador++) {
+					char Respuesta[] = {'S', 'A'};
+					int IndRespuesta = rand()%2;
+					int NumPalabraGenerada = 1 + rand()%25;
+					char Intento;
+					
+					cout << "Jugador #" << IndJugador + 1<<" ( "<< NombreJugador[IndJugador] <<" ) ---------> Número de Aciertos : " << ContadorAciertos[IndJugador] << "\n\n"
+					<< ObtenerCampo((IndRespuesta?"Sinónimos.txt":"Antónimos.txt"), NumPalabraGenerada, 2) << "\n\n"
+					"¿Son Sinónimos (S) o Antónimos (A)?\n"
+					"Formato de respuesta: S/A\n"
+					"Su respuesta: ";
+					
+					string MensajeAcierto = "\n\nMuy bien!!!\n"+NombreJugador[IndJugador]+" ha acertado, Gana 1 Punto\n\n\n";
+					string MensajeDesacierto = "\n\nMuy mal!!!\n"+NombreJugador[IndJugador]+" no ha acertado, No gana ningún Punto\n\n\n";
+
+					Intento = LeerValidandoChar('S', 'A');
+					cout << ( (Intento == Respuesta[IndRespuesta])?MensajeAcierto:MensajeDesacierto);
+					
+					if (Intento == Respuesta[IndRespuesta]) {
+						ContadorAciertos[IndJugador]++;
+					}
+				}
+				
+				NumTurno++;
+				
+				if (NumTurno < 15) {
+					cout <<"¿Desean continuar jugando?\n"
+					"Formato de respuesta: S/N\n"
+					"Su respuesta: ";
+					SeguirJugando = LeerValidandoChar('S', 'N');
+				}
+			} while (SeguirJugando == 'S' && NumTurno < 15);
+
+			system("cls");
+			cout <<	"****************************************************************\n";
+			cout.width(48.5);
+			cout <<right<< "Jugar antónimos y sinónimos\n";
+			cout << "****************************************************************\n\n";
+			VolverAlMenu = PantallaFinal(ContadorAciertos, NombreJugador);//Muestra la pantalla final y asigna bono al ganador si lo hay
+
+			if (ContadorAciertos[0] != ContadorAciertos[1]) {
+				int NumRegistroGanador = BuscarRegistro( (ContadorAciertos[0] > ContadorAciertos[1]?CedulaJugador[0]:CedulaJugador[1]), "Registros_jugadores.txt", 1 );
+				string PuntajeActualizado= ConvertirNum( (ContadorAciertos[0] > ContadorAciertos[1]?ContadorAciertos[0]:ContadorAciertos[1])+ConvertirString(ObtenerCampo("Registros_jugadores.txt", NumRegistroGanador, 3)) );
+				ModificarCampo("Registros_jugadores.txt", NumRegistroGanador, 3, PuntajeActualizado);
+			}//Fin if que actualiza el puntaje del jugador ganador en los registros
+
 			break;
 			}
 		case (4):
@@ -338,7 +412,7 @@ char LeerValidandoChar(char ValorPosible1, char ValorPosible2) {
 		//Fin validaciones de parámetros de ingreso
 		if (!RespuestaValida) {
 			cout << "\n\n   ***ERROR, DATOS INGRESADOS INVÁLIDOS***\n\n"
-			"Formato de respuesta: "<<ValorPosible1<<"/"<<ValorPosible2<<"\n";
+			"Formato de respuesta: "<<ValorPosible1<<"/"<<ValorPosible2<<"\n"
 			"Su respuesta: ";
 		}//Fin if para mostar mensaje de error en caso de no cumplir parámetros de ingreso
 	} while(!RespuestaValida);
@@ -444,7 +518,7 @@ void VerificarArchivoSistema(string Direccion) {
 		} else {
 			system("cls");
 			cout <<"\n\n\n   ***ERROR: UN ARCHIVO DEL SISTEMA HA SIDO ELIMINADO***\n\n\n"
-			"Verifique la existencia de los archivos:\n\n      *Sinónimos\n      *Antónimos\n      *Diptongos\n      *Hiatos\n\nY luego vuelva a ejecutar el programa";
+			"Verifique la existencia de los archivos:\n\n      *Sinónimos.txt\n      *Antónimos.txt\n      *Diptongos.txt\n      *Hiatos.txt\n\nY luego vuelva a ejecutar el programa";
 			Archivo.close();
 			exit(0);
 		}//Fin if-else que cierra la jecución si la apertura fallida fue de un archivo de sistema o crea uno nuevo si no
@@ -549,14 +623,14 @@ bool IngresoJugadores(string Cedula[], string Nombre[], const int NumJugadores) 
 			
 			if ( CedulaNoRegistrada ) {
 				cout << "\n\nLa cedula digitada no pertenece a ningún jugador registrado\n\n"
-				"¿Desea vover a intentar? De no ser el caso"
+				"¿Desea vover a intentar? De no ser el caso\n"
 				"regresará al menú principal\n\n"
 				"Formato de respuesta: S/N\n"
 				"Su respuesta: ";
 				SeguirIntentando = LeerValidandoChar('S', 'N');
 			}
 		} while ( CedulaNoRegistrada && SeguirIntentando != 'N' );
-		
+		cout << "\n";
 		if ( SeguirIntentando == 'N' ) {
 			return false;
 		}//Fin if que retorna false si se canceló el ingreso de datos para volver al menú principal
@@ -568,50 +642,75 @@ bool IngresoJugadores(string Cedula[], string Nombre[], const int NumJugadores) 
 	return true;
 }//Función de ingreso de usuarios que retorna true si se efectuó correctamente y false si se canceló el ingreso de datos
 
-void PantallaFinal(int Puntaje[], string Nombres[]) {
-	system("cls");
-	cout << (Puntaje[0]==Puntaje[1]?"EMPATE:\n"+Nombres[0]+" - "+Nombres[1]:"GANADOR:\n"+(Puntaje[0] > Puntaje[1]?Nombres[0]:Nombres[1]));
+bool PantallaFinal(int Puntaje[], string Nombres[]) {
+
+	cout << (Puntaje[0]==Puntaje[1]?"EMPATE:\n\n"+Nombres[0]+" - "+Nombres[1]:"GANADOR:\n\n"+(Puntaje[0] > Puntaje[1]?Nombres[0]:Nombres[1]));
 	
 	if (Puntaje[0]!=Puntaje[1]) {
 		if (Puntaje[0] > Puntaje[1]) {
-			cout << Nombres[0];
 			Puntaje[0] += 5;
 		} else {
-			cout << Nombres[1];
 			Puntaje[1] += 5;
 		}
 	}
-}
+	cout << "\n\n¿Desea volver al menú principal? De no ser el caso\n"
+	"finalizará la ejecución.\n\n"
+	"Formato de respuesta: S/N\n"
+	"Su respuesta: ";
+	return ( LeerValidandoChar('S', 'N') == 'S' ?true:false);
+}//Función que muestra la pantalla final
 
 void ModificarCampo (string Direccion, int RegistroObjetivo, int CampoObjetivo, string NuevoValor) {
-	int NumRegistro = 0;
 	const int NumCampos = 4;
+	int TotalDeRegistros = ContarRegistros(Direccion);
 	ifstream Archivo(Direccion);
-	
-	string AcumRegistros;
-	while (!Archivo.eof()) {
+	//Reinicio y apertura temp.txt
+	ofstream AcumRegistros("temp.txt");//Apertura del archivo en el modo por defecto para vaciarlo o crearlo 
+	AcumRegistros.close();//Cierre del archivo para poder cambiar el modo de apertura
+	AcumRegistros.open("temp.txt", ios::app);
+
+	for ( int NumRegistro = 0 ; NumRegistro < TotalDeRegistros ; NumRegistro++ ) {
 		string AuxiliarLectura;
-		NumRegistro++;
 		if (NumRegistro != RegistroObjetivo) {
 			getline(Archivo, AuxiliarLectura, '\n');
-			AcumRegistros += AuxiliarLectura+'\n';
+			AcumRegistros << AuxiliarLectura+'\n';
 		} else {
 			for(int NumCampo = 0 ; NumCampo < NumCampos ; NumCampo++) {
 				if (NumCampo + 1 != CampoObjetivo) {
-
 					getline(Archivo, AuxiliarLectura, ' ');
-					AcumRegistros += AuxiliarLectura+' ';
+					AcumRegistros << AuxiliarLectura+' ';
 				} else {
 					getline(Archivo, AuxiliarLectura, ' ');
-					AcumRegistros += NuevoValor+' ';
+					AcumRegistros << NuevoValor+' ';
 				}
 			}
-			AcumRegistros += '\n';
+			AcumRegistros << '\n';
 		}
+	}//Fin for que copia los datos de Registros_jugadores.txt a temp.txt a excepción del campo a modificar que es reemplazado con NuevoValor
+	AcumRegistros.close();
+	Archivo.close();
+
+	ofstream ArchivoRegistros(Direccion);
+	ifstream RegistrosActualizados("temp.txt");
+	for (int NumRegistro = 0; NumRegistro < TotalDeRegistros; NumRegistro++) {
+		string AuxiliarLectura;
+		getline(RegistrosActualizados, AuxiliarLectura, '\n');
+		ArchivoRegistros << AuxiliarLectura+'\n';
+	}//Fin for que transfiere los datos de temp.txt a Registros_jugadores.txt
+	
+	ArchivoRegistros.close();
+	RegistrosActualizados.close();
+}//Función que actualiza el valor del campo especificado asignándole el valor especificado
+
+int ContarRegistros(string Direccion) {
+	ifstream Archivo(Direccion);
+	string Auxiliar;
+	int NumRegistros = 0;
+	while ( getline(Archivo, Auxiliar, '\n') ) {
+		NumRegistros++;
 	}
 	Archivo.close();
 	
-	ofstream Archivo(Direccion);
-	Archivo << AcumRegistros;
-	Archivo.close();
-}
+	return NumRegistros;
+}//Función que retorna el número de registros de un archivo asumiendo que cada registro acaba en '\n'
+
