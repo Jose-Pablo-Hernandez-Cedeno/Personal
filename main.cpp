@@ -2,6 +2,7 @@
 #include <iostream>
 #include <iomanip>
 #include <math.h>
+#include <ctime>
 using namespace std;
 
 int MenuPrincipal();//Función que imprime el menú y retorna elección del usuario
@@ -11,7 +12,7 @@ int ConvertirString(string Cadena);//Función que recibe una cadena de caractere
 string ConvertirNum(int Numero);//Función que recibe un dato tipo int  y retorna su quivalente en forma de cadena de caracteres numéricos
 char LeerValidandoChar(char ValorPosible1, char ValorPosible2);//Función que lee un caracter validando que tome uno de los 2 valores especificados en los argumentos
 void RegistrarDatosUsuario();//Función que verifica que la cédula ingresada no esté ya registrada y registra los datos de ser el caso
-void NuevoRegistro(string Direccion, string ContenidoRegistro);//Función que escribe un nuevo registro con el contenido especificado en el archivo
+void Escribir(string Direccion, string ContenidoRegistro);//Función que escribe un nuevo registro con el contenido especificado en el archivo
 string LeerValidandoCedula();//Función que lee una cadena validando que solo tenga caracteres númericos y sean 10
 string LeerValidandoNombre();//Función que lee una cadena validando que no contenga ningún caracter de espacio en blanco
 int BuscarRegistro(string Dato, string Direccion, int NumCampo);//Algoritmo de búsqueda lineal del registro que contiene el dato especificado, del archivo especificado, sobre los campos indicados en el tercer argumento
@@ -26,8 +27,9 @@ void ModificarCampo(string Direccion, int RegistroObjetivo, int CampoObjetivo, s
 int ContarRegistros(string Direccion);//Función que retorna el número de registros de un archivo asumiendo que cada registro acaba en '\n'
 
 int main() {
-	setlocale(LC_CTYPE,"");
-	system("title Proyecto Final");
+	setlocale(LC_ALL,"Spanish");
+	system("title Jugando y aprendiendo con las palabras");
+	srand(time(0));
 
 	int EleccionMenu = 0;//Almacena la elección del usuario para el menú en caso de cumplirse parametros de entrada
 	bool VolverAlMenu = false;//Boleano que controla si debe reiniciarse el programa y o si no
@@ -149,9 +151,6 @@ int main() {
 				int NumRegistroGanador = BuscarRegistro( (ContadorAciertos[0] > ContadorAciertos[1]?CedulaJugador[0]:CedulaJugador[1]), "Registros_jugadores.txt", 1 );
 				string PuntajeActualizado= ConvertirNum( (ContadorAciertos[0] > ContadorAciertos[1]?ContadorAciertos[0]:ContadorAciertos[1])+ConvertirString(ObtenerCampo("Registros_jugadores.txt", NumRegistroGanador, 3)) );
 				ModificarCampo("Registros_jugadores.txt", NumRegistroGanador, 3, PuntajeActualizado);
-
-				cout<<"\n\n\n\n\ntxt:\n\n\n NumRegistroGanador: "<<NumRegistroGanador<<"\n"<<"PuntajeActualizado: "<<PuntajeActualizado<<"\n\n\n\n\n";
-				system("pause");
 			}//Fin if que actualiza el puntaje del jugador ganador
 
 			break;
@@ -203,7 +202,7 @@ int main() {
 				for (int IndJugador = 0 ; IndJugador < NumJugadores ; IndJugador++) {
 					char Respuesta[] = {'S', 'A'};
 					int IndRespuesta = rand()%2;
-					int NumPalabraGenerada = 1 + rand()%25;
+					int NumPalabraGenerada = 1 + rand()%20;
 					char Intento;
 					
 					cout << "Jugador #" << IndJugador + 1<<" ( "<< NombreJugador[IndJugador] <<" ) ---------> Número de Aciertos : " << ContadorAciertos[IndJugador] << "\n\n"
@@ -432,16 +431,16 @@ void RegistrarDatosUsuario() {
 			cout << "  ***El jugador ya existe en el registro, intentelo de nuevo***\n\n";
 		} else {
 			cout << "El jugador ha sido registrado correctamente!!!\n\n";
-			NuevoRegistro("Registros_jugadores.txt", Cedula+' '+NombreJugador+' '+'0'+' '+'\n');
+			Escribir("Registros_jugadores.txt", Cedula+' '+NombreJugador+' '+'0'+' '+'\n');
 		}
 	} while (CedulaRepetida);
 }//Función que verifica que cada cédula ingresada no esté ya registrada y registra los datos de ser el caso
 
-void NuevoRegistro(string Direccion, string ContenidoRegistro) {
+void Escribir(string Direccion, string ContenidoRegistro) {
 	ofstream archivo(Direccion, ios::app);
 	archivo << ContenidoRegistro;
 	archivo.close();
-}
+}//Función que escribe texto nuevo en un archivo, lo añade al final
 
 string LeerValidandoCedula() {
 	string Intento;//Almacena los datos ingresados
@@ -577,39 +576,35 @@ void MostrarMejoresJugadores() {
 }//Función que genera reporte de los 10 mejores jugadores
 
 void OrdenarRegistros() {
-	ofstream archivo("temp.txt");
-	archivo.close();
-	int RegistrosLeidos = 0;
+    ofstream Archivo("temp.txt");
+    Archivo.close();
 
-	while( ObtenerCampo("Registros_jugadores.txt", ++RegistrosLeidos, 1) != "\n\n" ) {
-		int NumRegistro = 0;
-		int PuntajeLeidoInt = 0;
-		int MayorPuntaje = 0;
-		int NumRegistroMejorPuntaje = 0;
-		while( ObtenerCampo("Registros_jugadores.txt", ++NumRegistro, 1) != "\n\n" ) {
-			PuntajeLeidoInt = ConvertirString(ObtenerCampo("Registros_jugadores.txt", NumRegistro, 3));
-			if (NumRegistro == 1) {
-				MayorPuntaje = PuntajeLeidoInt;
-				NumRegistroMejorPuntaje = NumRegistro;
-			} else if ( PuntajeLeidoInt > MayorPuntaje && !BuscarRegistro(ConvertirNum(NumRegistro), "temp.txt", 1) ) {
-				MayorPuntaje = PuntajeLeidoInt;
-				NumRegistroMejorPuntaje = NumRegistro;
-			}
+    int CantRegistros = ContarRegistros("Registros_jugadores.txt");
+    int MayorPuntaje = 0;
+    int NumRegistroMejorPuntaje = 0;
 
-		}
+	for (int NumRegistro = 1; NumRegistro <= CantRegistros; NumRegistro++) {
 
-		if ( !BuscarRegistro(ConvertirNum(NumRegistroMejorPuntaje), "temp.txt", 1) ) {
-			NuevoRegistro("temp.txt", ConvertirNum(NumRegistroMejorPuntaje)+' '+'\n');
-		}
+	    int PuntajeLeidoInt = ConvertirString(ObtenerCampo("Registros_jugadores.txt", NumRegistro, 3));
 
-		int NumRegistroVerif = 0;
-		while ( ObtenerCampo("Registros_jugadores.txt", ++NumRegistroVerif, 1) != "\n\n") {
-			if ( ConvertirString( ObtenerCampo("Registros_jugadores.txt", NumRegistroVerif, 3) ) == MayorPuntaje && !BuscarRegistro(ConvertirNum(NumRegistroVerif), "temp.txt", 1)) {
-				NuevoRegistro("temp.txt", ConvertirNum(NumRegistroVerif)+' '+'\n');
-			}
-		}
-	}
-}//Función que genera un archivo temporal en dónde, mediante referencias a los registros originales, enlista ascendentemente, respecto a los puntajes, los registros del archivo Registros_jugadores.txt
+	    if (NumRegistro == 1) {
+	    	MayorPuntaje = PuntajeLeidoInt;
+	    	NumRegistroMejorPuntaje = NumRegistro;
+	    } else if ( PuntajeLeidoInt > MayorPuntaje ) {
+	    	MayorPuntaje = PuntajeLeidoInt;
+	    	NumRegistroMejorPuntaje = NumRegistro;
+	    }
+    }//Fin for que encuentra al jugador con mejor puntaje
+
+    for (int PuntajeObjetivo = MayorPuntaje; PuntajeObjetivo >= 0; PuntajeObjetivo--) {
+        for (int NumRegistro = 0; NumRegistro < CantRegistros; NumRegistro++) {
+            if ( ConvertirString( ObtenerCampo("Registros_jugadores.txt", NumRegistro+1, 3) ) == PuntajeObjetivo ) {
+		    	Escribir("temp.txt", ConvertirNum(NumRegistro+1)+' '+'\n');
+            }//Fin if que registra en temp.txt la referencia del registro que se compara en cada ciclo si este contiene un puntaje igual al puntaje objetivo
+        }//Fin recorrido de los puntajes en el que se inserta en temp.txt la referencia del registro de aquellos que poseen valor igual a PuntajeObjetivo
+    }//Fin recorrido de todos los puntajes posibles en Registros_jugadores.txt en el que se registran en temp.txt la referencia de cada registro en orden ascendente
+
+}//Función que genera un archivo temporal en dónde, mediante referencias a los registros originales, enlista descendentemente, respecto a los puntajes, los registros del archivo Registros_jugadores.txt
 
 bool IngresoJugadores(string Cedula[], string Nombre[], const int NumJugadores) {
 	bool CedulaNoRegistrada = false;
@@ -661,33 +656,36 @@ bool PantallaFinal(int Puntaje[], string Nombres[]) {
 }//Función que muestra la pantalla final
 
 void ModificarCampo (string Direccion, int RegistroObjetivo, int CampoObjetivo, string NuevoValor) {
-	const int NumCampos = 4;
+	const int NumCampos = 3;
 	int TotalDeRegistros = ContarRegistros(Direccion);
 	ifstream Archivo(Direccion);
-	//Reinicio y apertura temp.txt
-	ofstream AcumRegistros("temp.txt");//Apertura del archivo en el modo por defecto para vaciarlo o crearlo 
-	AcumRegistros.close();//Cierre del archivo para poder cambiar el modo de apertura
-	AcumRegistros.open("temp.txt", ios::app);
+	//Reinicio y nueva apertura temp.txt para añadir registros
+	ofstream NuevoAcumRegistros("temp.txt");//Apertura del archivo en el modo por defecto para vaciarlo o crearlo
+	NuevoAcumRegistros.close();//Cierre del archivo para poder cambiar el modo de apertura
+
 
 	for ( int NumRegistro = 0 ; NumRegistro < TotalDeRegistros ; NumRegistro++ ) {
 		string AuxiliarLectura;
-		if (NumRegistro != RegistroObjetivo) {
+		if (NumRegistro + 1 != RegistroObjetivo) {
 			getline(Archivo, AuxiliarLectura, '\n');
+			ofstream AcumRegistros("temp.txt", ios::app);
 			AcumRegistros << AuxiliarLectura+'\n';
+			AcumRegistros.close();
 		} else {
 			for(int NumCampo = 0 ; NumCampo < NumCampos ; NumCampo++) {
 				if (NumCampo + 1 != CampoObjetivo) {
 					getline(Archivo, AuxiliarLectura, ' ');
-					AcumRegistros << AuxiliarLectura+' ';
+					Escribir("temp.txt", (AuxiliarLectura+' '));
 				} else {
 					getline(Archivo, AuxiliarLectura, ' ');
-					AcumRegistros << NuevoValor+' ';
+					Escribir("temp.txt", (NuevoValor+' '));
 				}
 			}
-			AcumRegistros << '\n';
+			AuxiliarLectura = '\n';
+			Escribir("temp.txt", AuxiliarLectura);
+			getline(Archivo, AuxiliarLectura, '\n');
 		}
-	}//Fin for que copia los datos de Registros_jugadores.txt a temp.txt a excepción del campo a modificar que es reemplazado con NuevoValor
-	AcumRegistros.close();
+	}//Fin for que copia los datos del archivo con la dirección especificada a temp.txt a excepción del campo a modificar que es reemplazado con NuevoValor
 	Archivo.close();
 
 	ofstream ArchivoRegistros(Direccion);
@@ -696,8 +694,8 @@ void ModificarCampo (string Direccion, int RegistroObjetivo, int CampoObjetivo, 
 		string AuxiliarLectura;
 		getline(RegistrosActualizados, AuxiliarLectura, '\n');
 		ArchivoRegistros << AuxiliarLectura+'\n';
-	}//Fin for que transfiere los datos de temp.txt a Registros_jugadores.txt
-	
+	}//Fin for que transfiere los datos de temp.txt al archivo con la dirección especificada
+
 	ArchivoRegistros.close();
 	RegistrosActualizados.close();
 }//Función que actualiza el valor del campo especificado asignándole el valor especificado
@@ -713,4 +711,3 @@ int ContarRegistros(string Direccion) {
 	
 	return NumRegistros;
 }//Función que retorna el número de registros de un archivo asumiendo que cada registro acaba en '\n'
-
