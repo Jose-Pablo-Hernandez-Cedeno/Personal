@@ -206,7 +206,7 @@ int main() {
 					char Intento;
 					
 					cout << "Jugador #" << IndJugador + 1<<" ( "<< NombreJugador[IndJugador] <<" ) ---------> Número de Aciertos : " << ContadorAciertos[IndJugador] << "\n\n"
-					<< ObtenerCampo((IndRespuesta?"Sinónimos.txt":"Antónimos.txt"), NumPalabraGenerada, 2) << "\n\n"
+					<< ObtenerCampo((IndRespuesta?"Antónimos.txt":"Sinónimos.txt"), NumPalabraGenerada, 2) << "\n\n"
 					"¿Son Sinónimos (S) o Antónimos (A)?\n"
 					"Formato de respuesta: S/A\n"
 					"Su respuesta: ";
